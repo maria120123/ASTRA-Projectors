@@ -33,6 +33,9 @@ classdef AstraBackwardProjector < AstraProjector
 
             
             % Size check
+            if size(B, 2) ~= length(b)
+                error("Dimension mismatch in forward projection.")
+            end
 
             % Call ASTRA
             % Set up sinogram in ASTRA

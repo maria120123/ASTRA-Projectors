@@ -8,13 +8,18 @@ classdef AstraForwardProjector < AstraProjector
             %   projection_geometry: 
             %   volume_geometry: 
             %   num_pixels:          Number of pixels in a row/coloumn
-            %   projection_id: 
+            %   projection_id:
 
-            self.projection_geometry = projection_geometry;
-            self.volume_geometry = volume_geometry;
-            self.num_pixels = num_pixels;
+            % Store sizes of the CT problem
+            self.num_angles     = num_angles;
+            self.num_pixels     = num_pixels;
+            self.num_detectors  = num_detectors;
 
-            % --- INSERT CODE HERE ---
+            % Store references to ASTRA objects
+            self.volume_geometry        = volume_geometry;
+            self.projection_geometry    = projection_geometry;
+
+            % Create forward projection algorithm
             self.cfg = astra_struct('FP_CUDA');
             self.cfg.ProjectorId = projection_id;
         end
@@ -30,6 +35,9 @@ classdef AstraForwardProjector < AstraProjector
 
             
             % Size check
+            if size(A, 2) ~= length(x)
+                error("Dimension mismatch in forward projection.")
+            end
 
             % Allocate memory
             % Set up sinogram in ASTRA

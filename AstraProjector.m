@@ -1,6 +1,5 @@
 classdef (Abstract) AstraProjector
 
-
     properties (Abstract)
         % Size of operators
         num_angles;
@@ -8,27 +7,13 @@ classdef (Abstract) AstraProjector
         num_pixels;
 
         % Astra stuff
-        projector_id;
         projector_geometry;
-
-        volume_id;          % Is defined on the fly
-        volume_geometry;    
-
-        sinogram_id;        % Is defined on the fly
-
+        volume_geometry;
         cfg;                % ASTRA algorithm struct
     end
 
     % Methods that are common for both forward and back projectors
     methods
-        % Tell ASTRA to deallopcate memory when MATLAB tries to delete the
-        % object.
-        function delete(self)
-            % Call ASTRA cleanup
-
-
-        end
-
         % Return the size of the operator
         function sz = size(self, dim)
             m = self.num_angles * self.num_detectors;

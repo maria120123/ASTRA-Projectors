@@ -8,20 +8,14 @@ classdef (Abstract) AstraProjector
         num_pixels;
 
         % Astra stuff
-        projector_id;
         projector_geometry;
-
-        volume_id;          % Is defined on the fly
-        volume_geometry;    
-
-        sinogram_id;        % Is defined on the fly
-
+        volume_geometry;
         cfg;                % ASTRA algorithm struct
     end
 
     % Methods that are common for both forward and back projectors
     methods
-        % Tell ASTRA to deallocate memory when MATLAB tries to delete the
+        % Tell ASTRA to deallopcate memory when MATLAB tries to delete the
         % object.
         function delete(self)
             % Call ASTRA cleanup
@@ -46,7 +40,7 @@ classdef (Abstract) AstraProjector
         end
 
         % Return a sparse matrix of the projector
-        function sparse_matrix = sparse()
+        function sparse_matrix = sparse(AB)
             % Size of the matrix
             m,n = size(AB);
 
@@ -79,9 +73,8 @@ classdef (Abstract) AstraProjector
             vals = zeros(num_nz, 1);
 
             % Reset counter
-            num_nz = 0;
             cnt = 1;
-            
+
             for i = 1:n
                 % Set unitvector
                 e(i) = 1.0;
@@ -89,20 +82,24 @@ classdef (Abstract) AstraProjector
                 % Perform matrix vector product (get the i'th column)
                 y = AB * e;
 
+                % Find the nonzero indices
                 rw, cl, vl = find(y > tol);
-                nnz = length(rw);
+                num_nz = length(rw);
 
-                % Save column
-                rows[cnt : (cnt+nnz-1)] = rw
-                cols[cnt : (cnt+nnz-1)] =
-                vals[cnt : (cnt+nnz-1)] =
+                % Save sparse components
+                rows(cnt : (cnt+num_nz-1)) = rw;
+                cols(cnt : (cnt+num_nz-1)) = cl;
+                vals(cnt : (cnt+num_nz-1)) = vl;
+
+                % Increment counter
+                cnt = cnt + num_nz;
 
                 % Unset unit vector
                 e(i) = 0.0;
             end
 
             % Create sparse projector
-            sparse_matrix = sparse(rows, cols, vals);
+            sparse_matrix = sparse(rows, cols, vals, m, n);
         end
 
 

@@ -34,13 +34,8 @@ if nargin < 8
     angles = angles(1:end-1);
 end
 
-
-
-% Todo: 
-% - kun source_origin, origin_det for fanbeam
-% - default vinkler 0:180 og 0:360
-% - default projection geometry
-
+% Error checks
+% ---------------------------------------------------------------
 % Ensure that all dependencies are correctly set up
 astra_setup();
 
@@ -67,12 +62,20 @@ projection_id = astra_create_projector('cuda', projection_geometry,...
 % ----------------------------------------------------------------
 % Create forward projector
 A = AstraForwardProjector(num_pixels, num_angles, num_dets, ...
-    projection_id, projection_geometry, volume_id, volume_geometry, ...
-    sinogram_id, reconstruction_id);
+    projection_id, projection_geometry, volume_geometry);
 
 % Create backward projector
 B = AstraBackwardProjector(num_pixels, num_angles, num_dets, ...
-    projection_id, projection_geometry, volume_id, volume_geometry, ...
-    sinogram_id, reconstruction_id);
+    projection_id, projection_geometry, volume_geometry);
+
+end
+
+
+
+function flag = astra_setup()
+    % Set output as failure for now
+    flag = 1;
+
+
 
 end
