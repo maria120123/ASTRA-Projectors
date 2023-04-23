@@ -21,7 +21,7 @@ classdef (Abstract) AstraProjector
 
     % Methods that are common for both forward and back projectors
     methods
-        % Tell ASTRA to deallocate memory when MATLAB tries to delete the
+        % Tell ASTRA to deallopcate memory when MATLAB tries to delete the
         % object.
         function delete(self)
             % Call ASTRA cleanup
