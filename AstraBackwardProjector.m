@@ -3,6 +3,10 @@ classdef AstraBackwardProjector < AstraProjector
     methods
         % Constructor
         function B = AstraBackwardProjector()
+
+            % Check if GPU requirements are fulfilled
+            checkGPU(use_gpu);
+
             % --- INSERT CODE HERE ---
 
         end
