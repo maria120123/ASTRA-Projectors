@@ -2,7 +2,10 @@ classdef AstraForwardProjector < AstraProjector
 
     methods
         % Constructor
-        function A = AstraForwardProjector()
+        function A = AstraForwardProjector(self, ....)
+            self.bla = 1
+            self.
+            
 
             % Check if GPU requirements are fulfilled
             checkGPU(use_gpu);

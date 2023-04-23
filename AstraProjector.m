@@ -11,11 +11,12 @@ classdef (Abstract) AstraProjector
         projector_id;
         projector_geometry;
 
-        volume_id;
-        volume_geometry;
+        volume_id;          % Is defined on the fly
+        volume_geometry;    
 
-        sinogram_id;
+        sinogram_id;        % Is defined on the fly
 
+        cfg;                % ASTRA algorithm struct
     end
 
     % Methods that are common for both forward and back projectors
