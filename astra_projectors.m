@@ -1,6 +1,14 @@
-function [A, B] = astra_projectors(num_pixels, num_angles, num_dets, ...
-    angles, proj_model, proj_geom, source_origin, origin_det, det_width)
+function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
+    angles, proj_geom, source_origin, origin_det, det_width)
 % Create and return a projector pair from ASTRA
+% 
+% Input:
+%   proj_geom: Projection geometry - should be "parallel" or "fanflat"
+
+% Todo: 
+% - kun source_origin, origin_det for fanbeam
+% - default vinkler 0:180 og 0:360
+% - default projection geometry
 
 % Ensure that all dependencies are correctly set up
 astra_setup();
@@ -11,7 +19,18 @@ checkGPU();
 % Setting up the geometry
 % ---------------------------------------------------------------
 % Set up projection geometry
-projection_id, projection_geometry = setup_projection();
+volume_geometry = astra_create_vol_geom(num_pixels, num_pixels);
+
+if proj_geom == "parallel"
+    projection_geometry = astra_create_proj_geom('parallel', det_width,... 
+        num_detectors, angles);
+else
+    projection_geometry = astra_create_proj_geom('fanflat', det_width,... 
+        num_detectors, angles, source_origin, origin_det);
+end
+
+projection_id = astra_create_projector('cuda', projection_geometry,... 
+    volume_geometry); 
 
 
 
