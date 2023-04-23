@@ -7,9 +7,6 @@ classdef (Abstract) AstraProjector
         num_detectors;
         num_pixels;
 
-        % Logical if we use GPU or CPU
-        use_gpu;
-
         % Astra stuff
         projector_id;
         projector_geometry;
@@ -23,10 +20,28 @@ classdef (Abstract) AstraProjector
 
     % Methods that are common for both forward and back projectors
     methods
+        % Tell ASTRA to deallocate memory when MATLAB tries to delete the
+        % object.
+        function delete(self)
+            % Call ASTRA cleanup
+
+
+        end
 
         % Return the size of the operator
-        function m, n = size(self, dim)
-            
+        function sz = size(self, dim)
+            m = self.num_angles * self.num_detectors;
+            n = self.num_pixels;
+
+            dims = [m, n];
+
+            if nargin == 1
+                sz = dims;
+            else
+                sz = dims(dim);
+            end
+
+            return;
         end
 
         % Return a sparse matrix of the projector

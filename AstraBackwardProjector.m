@@ -8,11 +8,13 @@ classdef AstraBackwardProjector < AstraProjector
             checkGPU(use_gpu);
 
             % --- INSERT CODE HERE ---
+            cfg = astra_struct('BP_CUDA');
+            cfg.ProjectorId = proj_id;
 
         end
 
         % Matrix multiplication B*b
-        function y = mtimes(b,vol_geom,proj_geom,num_angles,num_dets,proj_id)
+        function y = mtimes(B, b)
             % Inputs:
             %   b:
             %   vol_geom: 
@@ -28,20 +30,29 @@ classdef AstraBackwardProjector < AstraProjector
             % Size check
 
             % Call ASTRA
-            % --- INSERT CODE HERE ---
-            sinogram_id = astra_mex_data2d('create', '-sino', proj_geom, reshape(b,num_angles,num_dets));
-            recon_id = astra_mex_data2d('create', '-vol', vol_geom, 0);
+            % Set up sinogram in ASTRA
+            sinogram_id = astra_mex_data2d('create', '-sino', ...
+                B.projection_geometry, reshape(b,B.num_angles, B.num_dets));
 
-            cfg = astra_struct('BP_CUDA');
-            cfg.ProjectorId = proj_id;
-            cfg.ProjectionDataId = sinogram_id;
-            cfg.ReconstructionDataId = recon_id;
+            % Set up memory for reconstruction in ASTRA
+            reconstruction_id = astra_mex_data2d('create', '-vol', ...
+                B.vol_geom, 0);
 
-            bp_id = astra_mex_algorithm('create', cfg);
+            % Initialize ASTRA algorithm
+            B.cfg.ProjectionDataId = sinogram_id;
+            B.cfg.ReconstructionDataId = reconstruction_id;
+            bp_id = astra_mex_algorithm('create', B.cfg);
+
+            % Do matrix-vector multiplication
             astra_mex_algorithm('run', bp_id);
+
+            % Extract results
             Bb = astra_mex_data2d('get', recon_id);
             y = Bb(:);
 
+            % Delete the ASTRA memory that was allocated
+            astra_mex_data2d('delete', sinogram_id, volume_id);
+            astra_mex_algorithm('delete', fp_id);
         end
     end
 
