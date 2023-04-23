@@ -2,26 +2,31 @@ classdef AstraBackwardProjector < AstraProjector
 
     methods
         % Constructor
-        function B = AstraBackwardProjector()
+        function B = AstraBackwardProjector(self, projection_geometry,... 
+                volume_geometry, num_angles, num_detectors, projection_id)
+            % Input:
+            %   projection_geometry: 
+            %   volume_geometry:
+            %   num_angles: Number of view angles
+            %   num_detectors:   Number of detector elements
+            %   projection_id
 
-            % Check if GPU requirements are fulfilled
-            checkGPU(use_gpu);
+            self.projection_geometry = projection_geometry;
+            self.volume_geometry = volume_geometry;
+            self.num_angles = num_angles;
+            self.num_detectors = num_detectors;
 
             % --- INSERT CODE HERE ---
-            cfg = astra_struct('BP_CUDA');
-            cfg.ProjectorId = proj_id;
+            self.cfg = astra_struct('BP_CUDA');
+            self.cfg.ProjectorId = projection_id;
 
         end
 
         % Matrix multiplication B*b
         function y = mtimes(B, b)
             % Inputs:
+            %   B: 
             %   b:
-            %   vol_geom: 
-            %   proj_geom: Projection geometry 'parallel' or 'fanflat'
-            %   num_angles: Number of view angles
-            %   num_dets:   Number of detector elements
-            %   proj_id:
             %
             % Output:
             %   y: Back projection B*b
@@ -36,7 +41,7 @@ classdef AstraBackwardProjector < AstraProjector
 
             % Set up memory for reconstruction in ASTRA
             reconstruction_id = astra_mex_data2d('create', '-vol', ...
-                B.vol_geom, 0);
+                B.volume_geometry, 0);
 
             % Initialize ASTRA algorithm
             B.cfg.ProjectionDataId = sinogram_id;
@@ -50,6 +55,9 @@ classdef AstraBackwardProjector < AstraProjector
             Bb = astra_mex_data2d('get', recon_id);
             y = Bb(:);
 
+            % Delete the ASTRA memory that was allocated
+            astra_mex_data2d('delete', sinogram_id, volume_id);
+            astra_mex_algorithm('delete', fp_id);
         end
     end
 

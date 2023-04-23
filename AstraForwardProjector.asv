@@ -3,27 +3,32 @@ classdef AstraForwardProjector < AstraProjector
     methods
         % Constructor
         function A = AstraForwardProjector(self, projection_geometry,... 
-                volume_geometry, num_pixels, projection_id)
+                volume_geometry, num_pixels)
             % Input:
-            %   projection_geometry: 
+            %   projection_geometry: Projection geometry 'parallel' or 
+            %                        'fanflat'
             %   volume_geometry: 
             %   num_pixels:          Number of pixels in a row/coloumn
-            %   projection_id: 
 
             self.projection_geometry = projection_geometry;
             self.volume_geometry = volume_geometry;
             self.num_pixels = num_pixels;
+            
+
+            % Check if GPU requirements are fulfilled
+            checkGPU(use_gpu);
+
 
             % --- INSERT CODE HERE ---
             self.cfg = astra_struct('FP_CUDA');
-            self.cfg.ProjectorId = projection_id;
+            self.cfg.ProjectorId = proj_id;
         end
 
         % Matrix multiplication A*x
         function y = mtimes(A, x)
             % Inputs:
-            %   A: Struct
-            %   x: CT image as a vector
+            %   A: struct
+            %   x: vector which includes 
             %
             % Output:
             %   y: Forward projection multiplication
