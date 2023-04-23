@@ -1,9 +1,46 @@
 function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
     det_width, proj_geom, source_origin, origin_det, angles)
-% Create and return a projector pair from ASTRA
+% Create and return an unmatched projector pair from ASTRA
 % 
-% Input:
-%   proj_geom: Projection geometry - should be "parallel" or "fanflat"
+% OBS! You need to have a GPU - a warning will be printed if no GPU is
+% found.
+%
+% Input
+% ************************************************************************
+% Minimum requirement for astra_projectors() are the first four input
+% parameters (num_pixels, num_angles, num_detectors, and det_width).
+%  
+%   num_pixels:     Number of pixels in a row/coloumn (quadratic problem).
+%
+%   num_angles:     Number of view angles.
+%
+%   num_detectors:  Number of detector elements.
+% 
+%   det_width:      Width of detector element.
+% 
+%   proj_geom:      Projection geometry - should be "parallel" or "fanflat"
+%                   - (default) Parallel beam geometry
+%
+%   source_origin:  Distance from source to origin/center
+%                   - No need to include if parallel beam geometry is used.
+%
+%   origin_det:     Distance from origin/center to detector
+%                   - No need to include if parallel beam geometry is used.
+%
+%   angles:         All view angles
+%                   - (default) Equidistant angles between 0 and pi for
+%                   parallel beam geometry and equidistant angles between 
+%                   0 and 2*pi for fan beam geoemtry. 
+%
+%
+% Output 
+% ************************************************************************
+% astra_projectors() outputs an unmatched projector pair A and B.
+%
+% A: Forward projector
+%
+% B: Back projector
+%
 
 % Default setup is parallel beam
 if nargin < 5
