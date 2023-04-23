@@ -55,7 +55,7 @@ else
 end
 
 % Ensure that fan beam has all the inputs it needs
-if parallel_beam && nargin < 7
+if ~parallel_beam && nargin < 7
     error("Fan beam geometry requires additional inputs: source_origin and origin_det");
 end
 
@@ -77,7 +77,7 @@ end
 astra_setup();
 
 % Ensure that there is a GPU device
-checkGPU();
+checkGPU(true);
 
 % Setting up the geometry
 % ---------------------------------------------------------------
@@ -113,6 +113,6 @@ function flag = astra_setup()
     % Set output as failure for now
     flag = 1;
 
-
+    addpath("src/")
 
 end
