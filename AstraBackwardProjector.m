@@ -2,8 +2,9 @@ classdef AstraBackwardProjector < AstraProjector
 
     methods
         % Constructor
-        function B = AstraBackwardProjector(self, projection_geometry,... 
-                volume_geometry, num_angles, num_detectors, projection_id)
+        function B = AstraBackwardProjector(num_angles, num_pixels, ...
+                num_detectors, projection_id, projection_geometry, ...
+                volume_geometry)
             % Input:
             %   projection_geometry: 
             %   volume_geometry:
@@ -11,15 +12,35 @@ classdef AstraBackwardProjector < AstraProjector
             %   num_detectors:   Number of detector elements
             %   projection_id: 
 
-            self.projection_geometry = projection_geometry;
-            self.volume_geometry = volume_geometry;
-            self.num_angles = num_angles;
-            self.num_detectors = num_detectors;
+            % Store sizes of the CT problem
+            B.num_angles     = num_angles;
+            B.num_pixels     = num_pixels;
+            B.num_detectors  = num_detectors;
+
+            % Store references to ASTRA objects
+            B.volume_geometry        = volume_geometry;
+            B.projection_geometry    = projection_geometry;
 
             % --- INSERT CODE HERE ---
-            self.cfg = astra_struct('BP_CUDA');
-            self.cfg.ProjectorId = projection_id;
+            B.cfg = astra_struct('BP_CUDA');
+            B.cfg.ProjectorId = projection_id;
 
+        end
+
+        % Return the size of the operator
+        function sz = size(self, dim)
+            m = self.num_pixels * self.num_pixels;
+            n = self.num_angles * self.num_detectors;
+
+            dims = [m, n];
+
+            if nargin == 1
+                sz = dims;
+            else
+                sz = dims(dim);
+            end
+
+            return;
         end
 
         % Matrix multiplication B*b

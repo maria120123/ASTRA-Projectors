@@ -14,21 +14,6 @@ classdef (Abstract) AstraProjector
 
     % Methods that are common for both forward and back projectors
     methods
-        % Return the size of the operator
-        function sz = size(self, dim)
-            m = self.num_angles * self.num_detectors;
-            n = self.num_pixels;
-
-            dims = [m, n];
-
-            if nargin == 1
-                sz = dims;
-            else
-                sz = dims(dim);
-            end
-
-            return;
-        end
 
         % Return a sparse matrix of the projector
         function sparse_matrix = sparse(AB)

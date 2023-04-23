@@ -2,8 +2,9 @@ classdef AstraForwardProjector < AstraProjector
 
     methods
         % Constructor
-        function A = AstraForwardProjector(self, projection_geometry,... 
-                volume_geometry, num_pixels, projection_id)
+        function A = AstraForwardProjector(num_angles, num_pixels, ...
+                num_detectors, projection_id, projection_geometry, ...
+                volume_geometry)
             % Input:
             %   projection_geometry: 
             %   volume_geometry: 
@@ -11,17 +12,33 @@ classdef AstraForwardProjector < AstraProjector
             %   projection_id:
 
             % Store sizes of the CT problem
-            self.num_angles     = num_angles;
-            self.num_pixels     = num_pixels;
-            self.num_detectors  = num_detectors;
+            A.num_angles     = num_angles;
+            A.num_pixels     = num_pixels;
+            A.num_detectors  = num_detectors;
 
             % Store references to ASTRA objects
-            self.volume_geometry        = volume_geometry;
-            self.projection_geometry    = projection_geometry;
+            A.volume_geometry        = volume_geometry;
+            A.projection_geometry    = projection_geometry;
 
             % Create forward projection algorithm
-            self.cfg = astra_struct('FP_CUDA');
-            self.cfg.ProjectorId = projection_id;
+            A.cfg = astra_struct('FP_CUDA');
+            A.cfg.ProjectorId = projection_id;
+        end
+
+        % Return the size of the operator
+        function sz = size(self, dim)
+            m = self.num_angles * self.num_detectors;
+            n = self.num_pixels * self.num_pixels;
+
+            dims = [m, n];
+
+            if nargin == 1
+                sz = dims;
+            else
+                sz = dims(dim);
+            end
+
+            return;
         end
 
         % Matrix multiplication A*x
