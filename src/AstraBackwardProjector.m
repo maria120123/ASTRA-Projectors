@@ -22,7 +22,7 @@ classdef AstraBackwardProjector < AstraProjector
             B.projection_geometry    = projection_geometry;
 
             % --- INSERT CODE HERE ---
-            B.cfg = astra_struct('BP_CUDA');
+            B.cfg = astra_struct('BP');
             B.cfg.ProjectorId = projection_id;
 
         end

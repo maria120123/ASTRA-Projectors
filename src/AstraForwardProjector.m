@@ -21,7 +21,7 @@ classdef AstraForwardProjector < AstraProjector
             A.projection_geometry    = projection_geometry;
 
             % Create forward projection algorithm
-            A.cfg = astra_struct('FP_CUDA');
+            A.cfg = astra_struct('FP');
             A.cfg.ProjectorId = projection_id;
         end
 

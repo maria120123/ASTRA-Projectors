@@ -5,6 +5,7 @@ function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
 % OBS! You need to have a GPU - a warning will be printed if no GPU is
 % found.
 %
+% ************************************************************************
 % Input
 % ************************************************************************
 % Minimum requirement for astra_projectors() are the first four input
@@ -33,6 +34,7 @@ function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
 %                   0 and 2*pi for fan beam geoemtry. 
 %
 %
+% ************************************************************************
 % Output 
 % ************************************************************************
 % astra_projectors() outputs an unmatched projector pair A and B.
@@ -88,12 +90,14 @@ if parallel_beam
     projection_geometry = astra_create_proj_geom('parallel', det_width,... 
         num_detectors, angles);
 else
-    projection_geometry = astra_create_proj_geom('fanflat', det_wnum_pixels, idth,... 
+    projection_geometry = astra_create_proj_geom('fanflat', det_width,... 
         num_detectors, angles, source_origin, origin_det);
 end
 
-projection_id = astra_create_projector('cuda', projection_geometry,... 
-    volume_geometry); 
+%projection_id = astra_create_projector('cuda', projection_geometry,... 
+%    volume_geometry);  % GPU
+projection_id = astra_create_projector('linear', projection_geometry,...
+    volume_geometry);
 
 % Setting up the projectors
 % ----------------------------------------------------------------
