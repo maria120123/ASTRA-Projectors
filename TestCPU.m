@@ -1,4 +1,5 @@
-addpath("~/Desktop/PC_ABBA_projectors/ASTRA-Projectors")
+addpath("~/Desktop/ABBA_projectors/ASTRA-Projectors")
+astra_setup("~/astra") % Only needs to be run once
 %%
 num_pixels = 32;
 num_angles = 180;
