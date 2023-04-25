@@ -1,4 +1,4 @@
-function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
+function [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, ...
     det_width, proj_geom, source_origin, origin_det, angles)
 % Create and return an unmatched projector pair from ASTRA
 % 
@@ -10,6 +10,8 @@ function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
 % ************************************************************************
 % Minimum requirement for astra_projectors() are the first four input
 % parameters (num_pixels, num_angles, num_detectors, and det_width).
+%   GPU:            False (0) the algorithm uses the CPU and True (1) the
+%                   algorithm uses CPU.
 %  
 %   num_pixels:     Number of pixels in a row/coloumn (quadratic problem).
 %
@@ -32,7 +34,7 @@ function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
 %                   - (default) Equidistant angles between 0 and pi for
 %                   parallel beam geometry and equidistant angles between 
 %                   0 and 2*pi for fan beam geoemtry. 
-%
+% 
 %
 % ************************************************************************
 % Output 
@@ -45,7 +47,7 @@ function [A, B] = astra_projectors(num_pixels, num_angles, num_detectors, ...
 %
 
 % Default setup is parallel beam
-if nargin < 5
+if nargin < 6
     proj_geom = "parallel";
 end
 
@@ -57,16 +59,16 @@ else
 end
 
 % Ensure that fan beam has all the inputs it needs
-if ~parallel_beam && nargin < 7
+if ~parallel_beam && nargin < 8
     error("Fan beam geometry requires additional inputs: source_origin and origin_det");
 end
 
-if nargin < 8
+if nargin < 9
     % Assume equidistant angles
     if parallel_beam
-        angles = linspace(0, pi, num_pixels + 1);
+        angles = linspace(0, pi, num_angles + 1);
     else
-        angles = linspace(0, 2*pi, num_pixels + 1);
+        angles = linspace(0, 2*pi, num_angles + 1);
     end
 
     % Remove the end point to avoid duplicate angles
@@ -76,10 +78,10 @@ end
 % Error checks
 % ---------------------------------------------------------------
 % Ensure that all dependencies are correctly set up
-astra_setup();
+include_paths();
 
 % Ensure that there is a GPU device
-checkGPU(true);
+check_failed = checkGPU(GPU);
 
 % Setting up the geometry
 % ---------------------------------------------------------------
@@ -94,29 +96,65 @@ else
         num_detectors, angles, source_origin, origin_det);
 end
 
-%projection_id = astra_create_projector('cuda', projection_geometry,... 
-%    volume_geometry);  % GPU
-projection_id = astra_create_projector('linear', projection_geometry,...
+if GPU
+    try
+        projection_id = astra_create_projector('cuda', projection_geometry,... 
+            volume_geometry);  % using GPU
+    catch err
+        if check_failed
+            warning("MATLAB could not detect a GPU device ensure you" + ...
+                " have installed the GPU computing package. ")
+        end
+        rethrow(err)
+    end
+else
+    projection_id = astra_create_projector('linear', projection_geometry,...
     volume_geometry);
+end
 
 % Setting up the projectors
 % ----------------------------------------------------------------
 % Create forward projector
-A = AstraForwardProjector(num_angles, num_pixels, num_dets, ...
-    projection_id, projection_geometry, volume_geometry);
+A = AstraForwardProjector(num_angles, num_pixels, num_detectors, ...
+    projection_id, projection_geometry, volume_geometry, GPU);
 
 % Create backward projector
-B = AstraBackwardProjector(num_angles, num_pixels, num_dets, ...
-    projection_id, projection_geometry, volume_geometry);
+B = AstraBackwardProjector(num_angles, num_pixels, num_detectors, ...
+    projection_id, projection_geometry, volume_geometry, GPU);
 
 end
 
 
+function include_paths()
+    old_dir       = pwd();
+    projector_dir = my_filepath();
+    
+    cd(projector_dir);
+    
+    try
+        addpath("src/")
+        if isfile(".astra_root.mat")
+            load(".astra_root.mat")
+            addpath(astra_root + "/matlab/mex")
+            addpath(astra_root + "/matlab/tools")
+        end
+    catch
+        cd(old_dir);
+    end
+    cd(old_dir);
+end
 
-function flag = astra_setup()
-    % Set output as failure for now
-    flag = 1;
+% Magic
+function out = my_filepath()
 
-    addpath("src/")
+    mfilePath = mfilename('fullpath');
+    
+    if contains(mfilePath,'LiveEditorEvaluationHelper')
+        mfilePath = matlab.desktop.editor.getActiveFilename;
+    end
+
+    out = extractBefore(mfilePath,"/astra_projectors");
 
 end
+
+

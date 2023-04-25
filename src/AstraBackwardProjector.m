@@ -4,7 +4,7 @@ classdef AstraBackwardProjector < AstraProjector
         % Constructor
         function B = AstraBackwardProjector(num_angles, num_pixels, ...
                 num_detectors, projection_id, projection_geometry, ...
-                volume_geometry)
+                volume_geometry, GPU)
             % Input:
             %   projection_geometry: 
             %   volume_geometry:
@@ -19,10 +19,14 @@ classdef AstraBackwardProjector < AstraProjector
 
             % Store references to ASTRA objects
             B.volume_geometry        = volume_geometry;
+            B.projection_id          = projection_id;
             B.projection_geometry    = projection_geometry;
 
-            % --- INSERT CODE HERE ---
-            B.cfg = astra_struct('BP');
+            if GPU
+                B.cfg = astra_struct('BP_CUDA');
+            else
+                B.cfg = astra_struct('BP');
+            end
             B.cfg.ProjectorId = projection_id;
 
         end
@@ -61,7 +65,7 @@ classdef AstraBackwardProjector < AstraProjector
             % Call ASTRA
             % Set up sinogram in ASTRA
             sinogram_id = astra_mex_data2d('create', '-sino', ...
-                B.projection_geometry, reshape(b,B.num_angles, B.num_dets));
+                B.projection_geometry, reshape(b,B.num_angles, B.num_detectors));
 
             % Set up memory for reconstruction in ASTRA
             reconstruction_id = astra_mex_data2d('create', '-vol', ...
@@ -76,12 +80,12 @@ classdef AstraBackwardProjector < AstraProjector
             astra_mex_algorithm('run', bp_id);
 
             % Extract results
-            Bb = astra_mex_data2d('get', recon_id);
+            Bb = astra_mex_data2d('get', reconstruction_id);
             y = Bb(:);
 
             % Delete the ASTRA memory that was allocated
-            astra_mex_data2d('delete', sinogram_id, volume_id);
-            astra_mex_algorithm('delete', fp_id);
+            astra_mex_data2d('delete', sinogram_id, reconstruction_id);
+            astra_mex_algorithm('delete', bp_id);
         end
     end
 

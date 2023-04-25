@@ -4,7 +4,7 @@ classdef AstraForwardProjector < AstraProjector
         % Constructor
         function A = AstraForwardProjector(num_angles, num_pixels, ...
                 num_detectors, projection_id, projection_geometry, ...
-                volume_geometry)
+                volume_geometry, GPU)
             % Input:
             %   projection_geometry: 
             %   volume_geometry: 
@@ -18,10 +18,15 @@ classdef AstraForwardProjector < AstraProjector
 
             % Store references to ASTRA objects
             A.volume_geometry        = volume_geometry;
+            A.projection_id          = projection_id;
             A.projection_geometry    = projection_geometry;
 
             % Create forward projection algorithm
-            A.cfg = astra_struct('FP');
+            if GPU
+                A.cfg = astra_struct('FP_CUDA');
+            else
+                A.cfg = astra_struct('FP');
+            end
             A.cfg.ProjectorId = projection_id;
         end
 
@@ -37,8 +42,12 @@ classdef AstraForwardProjector < AstraProjector
             else
                 sz = dims(dim);
             end
+        end
 
-            return;
+        function sparse_matrix = sparse(A)
+            matrix_id = astra_mex_projector('matrix', A.projection_id);
+            sparse_matrix = astra_mex_matrix('get', matrix_id);
+            astra_mex_matrix('delete', matrix_id);
         end
 
         % Matrix multiplication A*x

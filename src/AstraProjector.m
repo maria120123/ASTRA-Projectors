@@ -1,13 +1,14 @@
-classdef (Abstract) AstraProjector
+classdef AstraProjector
 
-    properties (Abstract)
+    properties
         % Size of operators
         num_angles;
         num_detectors;
         num_pixels;
 
         % Astra stuff
-        projector_geometry;
+        projection_id;
+        projection_geometry;
         volume_geometry;
         cfg;                % ASTRA algorithm struct
     end
@@ -17,8 +18,11 @@ classdef (Abstract) AstraProjector
 
         % Return a sparse matrix of the projector
         function sparse_matrix = sparse(AB)
+        % Note: memory efficient, but twice as slow as full()
+
             % Size of the matrix
-            m,n = size(AB);
+            sz = size(AB);
+            m = sz(1); n = sz(2);
 
             % Allocate unit vector
             e = zeros(n, 1);
@@ -59,13 +63,14 @@ classdef (Abstract) AstraProjector
                 y = AB * e;
 
                 % Find the nonzero indices
-                rw, cl, vl = find(y > tol);
+                [rw, ~, vl] = find(y);
                 num_nz = length(rw);
 
                 % Save sparse components
-                rows(cnt : (cnt+num_nz-1)) = rw;
-                cols(cnt : (cnt+num_nz-1)) = cl;
-                vals(cnt : (cnt+num_nz-1)) = vl;
+                id_end = cnt+num_nz-1;
+                rows(cnt : id_end) = rw;
+                cols(cnt : id_end) = i;
+                vals(cnt : id_end) = vl;
 
                 % Increment counter
                 cnt = cnt + num_nz;
@@ -82,7 +87,8 @@ classdef (Abstract) AstraProjector
         % Return a full amtrix of the projector
         function full_matrix = full(AB)
             % Size of the matrix
-            m,n = size(AB);
+            sz = size(AB);
+            m = sz(1); n = sz(2);
 
             % Allocate the matrix
             full_matrix = zeros(m, n);
@@ -91,6 +97,9 @@ classdef (Abstract) AstraProjector
             e = zeros(n, 1);
 
             for i = 1:n
+                if mod(i, 500) == 0
+                    fprintf("Filling matrix: %f%%\r", round(i/n * 100))
+                end
                 % Set unitvector
                 e(i) = 1.0;
 
