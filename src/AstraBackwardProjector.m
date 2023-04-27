@@ -1,3 +1,12 @@
+% AstraBackwardProjector Abstraction of a CT forward matrix run by ASTRA.
+% 
+% This operator acts as a matrix and can compute fast and memory efficient
+% matrix-vector products.
+%
+% The AstraProjectors support the following functions
+%   Multiplication:         * or mtines().
+%   Matrix represntation:   full() or sparse().
+%   Size output:            size().
 classdef AstraBackwardProjector < AstraProjector
 
     methods
@@ -34,8 +43,13 @@ classdef AstraBackwardProjector < AstraProjector
 
         end
 
-        % Return the size of the operator
+        
         function sz = size(self, dim)
+            % sz = size(self, [dim])
+            %
+            % Return the size of the operator for, optionally, the
+            % specified dimension.
+            
             m = self.num_pixels * self.num_pixels;
             n = self.num_angles * self.num_detectors;
 
@@ -50,8 +64,11 @@ classdef AstraBackwardProjector < AstraProjector
             return;
         end
 
-        % Matrix multiplication B*b
         function y = mtimes(B, b)
+            % mtimes Compute backward projection of a CT image.
+            % The backward projection is computed as a matrix 
+            % multiplication B*b.
+            %
             % Inputs:
             %   B: Back projection operator
             %   b: Sinogram as a vector

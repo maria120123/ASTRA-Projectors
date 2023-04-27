@@ -1,3 +1,12 @@
+% AstraForwardProjector Abstraction of a CT forward matrix run by ASTRA.
+% 
+% This operator acts as a matrix and can compute fast and memory efficient
+% matrix-vector products.
+%
+% The AstraProjectors support the following functions
+%   Multiplication:         * or mtines().
+%   Matrix represntation:   full() or sparse().
+%   Size output:            size().
 classdef AstraForwardProjector < AstraProjector
 
     methods
@@ -36,6 +45,11 @@ classdef AstraForwardProjector < AstraProjector
 
         % Return the size of the operator
         function sz = size(self, dim)
+            % sz = size(self, [dim])
+            %
+            % Return the size of the operator for, optionally, the
+            % specified dimension.
+
             m = self.num_angles * self.num_detectors;
             n = self.num_pixels * self.num_pixels;
 
@@ -49,19 +63,34 @@ classdef AstraForwardProjector < AstraProjector
         end
 
         function sparse_matrix = sparse(A)
+            % sparse create sparse matrix.
+            % sparse_matrix = sparse(A) converts an ASTRA projector into a
+            % sparse matrix 
+            %
+            % Inputs:
+            %   A: AstraForwardProjector
+            %
+            % Outputs:
+            %   sparse_matrix: Sparse representation of the forward
+            %   operator A.
+            
             matrix_id = astra_mex_projector('matrix', A.projection_id);
             sparse_matrix = astra_mex_matrix('get', matrix_id);
             astra_mex_matrix('delete', matrix_id);
         end
 
-        % Matrix multiplication A*x
+        
         function y = mtimes(A, x)
+            % mtimes Compute forward projection of a CT image.
+            % The forward projection is computed as a matrix 
+            % multiplication A*x.
+            %
             % Inputs:
             %   A: Forward projection operator
             %   x: CT image as a vector
             %
             % Output:
-            %   y: Sinogram
+            %   y: Sinogram as a vector
 
             
             % Size check

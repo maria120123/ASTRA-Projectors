@@ -1,3 +1,5 @@
+% AstraProjector Superclass of forward and backward-projectors wrapping
+% ASTRA calls.
 classdef AstraProjector
 
     properties
@@ -18,7 +20,16 @@ classdef AstraProjector
 
         % Return a sparse matrix of the projector
         function sparse_matrix = sparse(AB)
-        % Note: memory efficient, but twice as slow as full()
+            % sparse create sparse matrix.
+            % sparse_matrix = sparse(A) converts an ASTRA projector into a
+            % sparse matrix 
+            %
+            % Inputs:
+            %   A: AstraProjector
+            %
+            % Outputs:
+            %   sparse_matrix: Sparse representation of the forward
+            %   operator A.
 
             % Size of the matrix
             sz = size(AB);
@@ -83,9 +94,15 @@ classdef AstraProjector
             sparse_matrix = sparse(rows, cols, vals, m, n);
         end
 
-
-        % Return a full matrix of the projector
         function full_matrix = full(AB)
+            % full Compute a matrix representation of the projector.
+            %
+            % Inputs:
+            %   AB - AstraProjector
+            %
+            % Output:
+            %   full_matrix - Matrix representation of the operator.
+
             % Size of the matrix
             sz = size(AB);
             m = sz(1); n = sz(2);
