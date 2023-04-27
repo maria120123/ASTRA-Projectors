@@ -41,12 +41,16 @@ classdef AstraProjector
             num_nz = 0;
             tol = 1e-6; % Tolerance for when a number is nonzero
 
+            % Status text
+            f = waitbar(0, 'starting');
+
             % Count the number of nonzeroes
             % ----------------------------------------------------
             for i = 1:n
                 if mod(i, 500) == 0
-                    fprintf("\rCounting nonzeroes: %.1f%%", ...
-                        round(i/n * 100, 1, 'decimals'))
+                    prog = sprintf("\rCounting nonzeroes: %.1f%%", ...
+                        round(i/n * 100, 1, 'decimals'));
+                    waitbar(i/n, f, prog)
                 end
                 % Set unitvector
                 e(i) = 1.0;
@@ -72,8 +76,9 @@ classdef AstraProjector
 
             for i = 1:n
                 if mod(i, 500) == 0
-                    fprintf("\rFilling matrix: %.1f%%", ...
-                        round(i/n * 100, 1, 'significant'))
+                    prog = sprintf("\rFilling matrix: %.1f%%", ...
+                        round(i/n * 100, 1, 'significant'));
+                    waitbar(i/n, f, prog)
                 end
                 % Set unitvector
                 e(i) = 1.0;
@@ -97,6 +102,8 @@ classdef AstraProjector
                 % Unset unit vector
                 e(i) = 0.0;
             end
+
+            close(f)
 
             % Create sparse projector
             sparse_matrix = sparse(rows, cols, vals, m, n);
