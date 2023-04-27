@@ -84,7 +84,7 @@ classdef AstraProjector
         end
 
 
-        % Return a full amtrix of the projector
+        % Return a full matrix of the projector
         function full_matrix = full(AB)
             % Size of the matrix
             sz = size(AB);

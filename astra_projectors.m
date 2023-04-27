@@ -1,6 +1,6 @@
 function [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, ...
     det_width, proj_geom, source_origin, origin_det, angles)
-% Create and return an unmatched projector pair from ASTRA
+% Create and return an unmatched projector pair from ASTRA.
 % 
 % OBS! You need to have a GPU - a warning will be printed if no GPU is
 % found.

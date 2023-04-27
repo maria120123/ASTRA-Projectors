@@ -6,10 +6,14 @@ classdef AstraForwardProjector < AstraProjector
                 num_detectors, projection_id, projection_geometry, ...
                 volume_geometry, GPU)
             % Input:
-            %   projection_geometry: 
-            %   volume_geometry: 
-            %   num_pixels:          Number of pixels in a row/coloumn
-            %   projection_id:
+            %   num_angles:          Number of view angles
+            %   num_pixels:          Number of pixels in column/row of 
+            %                        image x (square image)  
+            %   num_detectors:       Number of detector elements
+            %   projection_id:       ASTRA id
+            %   projection_geometry: ASTRA struct
+            %   volume_geometry:     ASTRA struct
+            %   GPU:                 Boolean indicating use of GPU
 
             % Store sizes of the CT problem
             A.num_angles     = num_angles;
@@ -53,11 +57,11 @@ classdef AstraForwardProjector < AstraProjector
         % Matrix multiplication A*x
         function y = mtimes(A, x)
             % Inputs:
-            %   A: Struct
+            %   A: Forward projection operator
             %   x: CT image as a vector
             %
             % Output:
-            %   y: Forward projection multiplication
+            %   y: Sinogram
 
             
             % Size check

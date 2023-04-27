@@ -1,5 +1,15 @@
 function astra_setup(astra_root)
-% 
+% Set up the path to the ASTRA folder and relevant subfolders.
+%
+% OBS: This routine should only be run once. 
+%
+% ************************************************************************
+% Input
+% ************************************************************************
+% astra_root: Path to ASTRA toolbox
+%             - example: "home/astra" 
+%
+
     % Save old directory
     old_dir = pwd;
 

@@ -6,11 +6,14 @@ classdef AstraBackwardProjector < AstraProjector
                 num_detectors, projection_id, projection_geometry, ...
                 volume_geometry, GPU)
             % Input:
-            %   projection_geometry: 
-            %   volume_geometry:
-            %   num_angles: Number of view angles
-            %   num_detectors:   Number of detector elements
-            %   projection_id: 
+            %   num_angles:          Number of view angles
+            %   num_pixels:          Number of pixels in column/row of 
+            %                        image x (square image)  
+            %   num_detectors:       Number of detector elements
+            %   projection_id:       ASTRA id
+            %   projection_geometry: ASTRA struct
+            %   volume_geometry:     ASTRA struct
+            %   GPU:                 Boolean indicating use of GPU
 
             % Store sizes of the CT problem
             B.num_angles     = num_angles;
@@ -50,11 +53,11 @@ classdef AstraBackwardProjector < AstraProjector
         % Matrix multiplication B*b
         function y = mtimes(B, b)
             % Inputs:
-            %   B: 
-            %   b:
+            %   B: Back projection operator
+            %   b: Sinogram as a vector
             %
             % Output:
-            %   y: Back projection B*b
+            %   y: CT image as a vector
 
             
             % Size check

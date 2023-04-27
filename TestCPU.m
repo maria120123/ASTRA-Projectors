@@ -1,6 +1,13 @@
-addpath("~/Desktop/ABBA_projectors/ASTRA-Projectors")
+%% Test file for th ASTRA-Projector toolbox
+% Here we illustrate the use of the toolbox when using a CPU. 
+%
+% Note: Using CPU results in a matched projector pair!
+
+%% Load path to ASTRA-Projectors toolbox and set up ASTRA
+addpath("~/Desktop/ABBA_projectors/ASTRA-Projectors") % Path to toolbox
 astra_setup("~/astra") % Only needs to be run once
-%%
+
+%% Set up CT specifications and create the projector pair
 num_pixels = 32;
 num_angles = 180;
 num_detectors = 32;
