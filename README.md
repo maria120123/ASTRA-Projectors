@@ -1,7 +1,7 @@
 # Documentation for the ASTRA-Projectors package
 
 This MATLAB package creates a pair of matrix free forward and backward
-projectors from ASTRA that are easy to incorporate into existing code.
+projectors from ASTRA that are easy to use and incorporate into existing code.
 
 ## Supported ASTRA projectors
 The following ASTRA projectors are supported:
