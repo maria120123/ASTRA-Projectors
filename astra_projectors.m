@@ -1,6 +1,6 @@
 function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
     num_detectors, det_width, proj_geom, source_origin, origin_det, ...
-    angles, projection_model)
+    projection_model, angles)
 % Create and return an unmatched projector pair from ASTRA.
 % 
 % OBS! You need to have a GPU - a warning will be printed if no GPU is
@@ -48,24 +48,32 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 %   B: Back projection operator.
 %
 
-% Default setup is parallel beam
-if ~exist('proj_geom', 'var') < 6
-    proj_geom = "parallel";
+% List of arguments
+arguments
+    GPU                 int64
+    num_pixels          int64
+    num_angles          int64
+    num_detectors       int64
+    det_width           double
+    proj_geom           (1,:)           = missing
+    source_origin                       = missing
+    origin_det                          = missing
+    projection_model    (1,:) char      = 'line'
+    angles              (1,:) double    = missing
 end
 
-% Determine CT beam type
-if strcmp(proj_geom, "parallel")
-    parallel_beam = true;
-else
-    parallel_beam = false;
+if ismissing(proj_geom)
+    proj_geom = 'parallel';
 end
+
+parallel_beam = strcmp(proj_geom, 'parallel');
 
 % Ensure that fan beam has all the inputs it needs
-if ~parallel_beam && nargin < 8
+if ~parallel_beam && (ismissing(source_origin) || ismissing(origin_det))
     error("Fan beam geometry requires additional inputs: source_origin and origin_det");
 end
 
-if ~exist('angles', 'var') < 9
+if ismissing(angles)
     % Assume equidistant angles
     if parallel_beam
         angles = linspace(0, pi, num_angles + 1);
@@ -75,10 +83,10 @@ if ~exist('angles', 'var') < 9
 
     % Remove the end point to avoid duplicate angles
     angles = angles(1:end-1);
-end
-
-if ~exist('projection_model', 'var')
-    projection_model = 'linear';
+else
+    if num_angles ~= length(angles)
+        error("Mismatch between num_angles and length(angles).")
+    end
 end
 
 % Error checks
@@ -114,6 +122,11 @@ if GPU
         rethrow(err)
     end
 else
+    % 
+    if ~parallel_beam
+        projection_model = strcat(projection_model, '_fanflat');
+    end
+
     projection_id = astra_create_projector(projection_model, ...
         projection_geometry, volume_geometry);
 end
