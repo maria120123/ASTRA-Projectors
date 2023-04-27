@@ -44,6 +44,10 @@ classdef AstraProjector
             % Count the number of nonzeroes
             % ----------------------------------------------------
             for i = 1:n
+                if mod(i, 500) == 0
+                    fprintf("Counting nonzeroes: %f%%\r", ...
+                        round(i/n * 100, 1, 'significant'))
+                end
                 % Set unitvector
                 e(i) = 1.0;
 
@@ -67,6 +71,10 @@ classdef AstraProjector
             cnt = 1;
 
             for i = 1:n
+                if mod(i, 500) == 0
+                    fprintf("Filling matrix: %f%%\r", ...
+                        round(i/n * 100, 1, 'significant'))
+                end
                 % Set unitvector
                 e(i) = 1.0;
 
