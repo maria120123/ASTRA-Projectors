@@ -10,8 +10,8 @@ o	An automatic check has been implemented based on the MATLAB package GPU comput
 
 Include the package folder.
 -	Run either:
-1)	_astra_setup()_ included in this package providing the file path to the ASTRA installation (only the first time).
-2)	Include the ASTRA directories matlab/mex and matlab/tools.
+    1)	_astra_setup()_ included in this package providing the file path to the ASTRA installation (only the first time).
+    2)	Include the ASTRA directories matlab/mex and matlab/tools.
 
 Now you are ready to use the ASTRA-Projectors package.
 
