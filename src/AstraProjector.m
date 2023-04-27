@@ -26,7 +26,7 @@ classdef AstraProjector
             %
             % Inputs:
             %   A: AstraProjector
-            %
+            %nargin
             % Outputs:
             %   sparse_matrix: Sparse representation of the forward
             %   operator A.
@@ -45,8 +45,8 @@ classdef AstraProjector
             % ----------------------------------------------------
             for i = 1:n
                 if mod(i, 500) == 0
-                    fprintf("Counting nonzeroes: %f%%\r", ...
-                        round(i/n * 100, 1, 'significant'))
+                    fprintf("\rCounting nonzeroes: %.1f%%", ...
+                        round(i/n * 100, 1, 'decimals'))
                 end
                 % Set unitvector
                 e(i) = 1.0;
@@ -72,7 +72,7 @@ classdef AstraProjector
 
             for i = 1:n
                 if mod(i, 500) == 0
-                    fprintf("Filling matrix: %f%%\r", ...
+                    fprintf("\rFilling matrix: %.1f%%", ...
                         round(i/n * 100, 1, 'significant'))
                 end
                 % Set unitvector
@@ -123,7 +123,8 @@ classdef AstraProjector
 
             for i = 1:n
                 if mod(i, 500) == 0
-                    fprintf("Filling matrix: %f%%\r", round(i/n * 100))
+                    fprintf("\rFilling matrix: %.1f%%", ...
+                        round(i/n * 100, 1, "decimals"))
                 end
                 % Set unitvector
                 e(i) = 1.0;
