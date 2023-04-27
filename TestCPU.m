@@ -15,7 +15,7 @@ det_width = 1;
 GPU = 0;
 
 [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, ...
-    det_width);
+    det_width, missing, missing, missing, 'linear');
 
 %% Size of operators
 A_size = size(A);
@@ -29,7 +29,7 @@ Af = sparse(A); % full(A) is also availabe
 Bf = sparse(B); % full(B) is also availabe
 
 %% Plot one ray moving through the image x
-idx = 313;
+idx = 10;
 xray = reshape(Af(idx, :), num_pixels, num_pixels);
 
 imagesc(xray)
