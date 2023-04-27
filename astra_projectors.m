@@ -1,5 +1,6 @@
-function [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, ...
-    det_width, proj_geom, source_origin, origin_det, angles)
+function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
+    num_detectors, det_width, proj_geom, source_origin, origin_det, ...
+    angles, projection_model)
 % Create and return an unmatched projector pair from ASTRA.
 % 
 % OBS! You need to have a GPU - a warning will be printed if no GPU is
@@ -10,44 +11,45 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, .
 % ************************************************************************
 % Minimum requirement for astra_projectors() are the first four input
 % parameters (num_pixels, num_angles, num_detectors, and det_width).
-%   GPU:            False (0) the algorithm uses the CPU and True (1) the
-%                   algorithm uses CPU.
+%   GPU:              False (0) the algorithm uses the CPU and True (1) the
+%                     algorithm uses CPU.
 %  
-%   num_pixels:     Number of pixels in a row/coloumn (quadratic problem).
+%   num_pixels:       Number of pixels in a row/coloumn (quadratic problem).
 %
-%   num_angles:     Number of view angles.
+%   num_angles:       Number of view angles.
 %
-%   num_detectors:  Number of detector elements.
+%   num_detectors:    Number of detector elements.
 % 
-%   det_width:      Width of detector element.
+%   det_width:        Width of detector element.
 % 
-%   proj_geom:      Projection geometry - should be "parallel" or "fanflat"
-%                   - (default) Parallel beam geometry
+%   proj_geom:        Projection geometry - should be "parallel" or "fanflat"
+%                     - (default) Parallel beam geometry
 %
-%   source_origin:  Distance from source to origin/center
-%                   - No need to include if parallel beam geometry is used.
+%   source_origin:    Distance from source to origin/center
+%                     - No need to include if parallel beam geometry is used.
 %
-%   origin_det:     Distance from origin/center to detector
-%                   - No need to include if parallel beam geometry is used.
+%   origin_det:       Distance from origin/center to detector
+%                     - No need to include if parallel beam geometry is used.
 %
-%   angles:         All view angles
-%                   - (default) Equidistant angles between 0 and pi for
-%                   parallel beam geometry and equidistant angles between 
-%                   0 and 2*pi for fan beam geoemtry. 
+%   angles:           All view angles
+%                     - (default) Equidistant angles between 0 and pi for
+%                     parallel beam geometry and equidistant angles between 
+%                     0 and 2*pi for fan beam geoemtry.
 % 
-%
+%   projection_model: Projection model can be 'line', 'strip' or 'linear'.
+%                     - (default) 'linear'
 % ************************************************************************
 % Output 
 % ************************************************************************
 % astra_projectors() outputs an unmatched projector pair A and B.
 %
-% A: Forward projector
+%   A: Forward projection operator.
 %
-% B: Back projector
+%   B: Back projection operator.
 %
 
 % Default setup is parallel beam
-if nargin < 6
+if ~exist('proj_geom', 'var') < 6
     proj_geom = "parallel";
 end
 
@@ -63,7 +65,7 @@ if ~parallel_beam && nargin < 8
     error("Fan beam geometry requires additional inputs: source_origin and origin_det");
 end
 
-if nargin < 9
+if ~exist('angles', 'var') < 9
     % Assume equidistant angles
     if parallel_beam
         angles = linspace(0, pi, num_angles + 1);
@@ -73,6 +75,10 @@ if nargin < 9
 
     % Remove the end point to avoid duplicate angles
     angles = angles(1:end-1);
+end
+
+if ~exist('projection_model', 'var')
+    projection_model = 'linear';
 end
 
 % Error checks
@@ -108,8 +114,8 @@ if GPU
         rethrow(err)
     end
 else
-    projection_id = astra_create_projector('linear', projection_geometry,...
-    volume_geometry);
+    projection_id = astra_create_projector(projection_model, ...
+        projection_geometry, volume_geometry);
 end
 
 % Setting up the projectors
