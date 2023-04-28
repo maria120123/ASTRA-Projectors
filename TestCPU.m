@@ -1,4 +1,4 @@
-%% Test file for th ASTRA-Projector toolbox
+%% Test file for the ASTRA-Projector toolbox
 % Here we illustrate the use of the toolbox when using a CPU. 
 %
 % Note: Using CPU results in a matched projector pair!
@@ -8,9 +8,9 @@ addpath("~/Desktop/ABBA_projectors/ASTRA-Projectors") % Path to toolbox
 astra_setup("~/astra") % Only needs to be run once
 
 %% Set up CT specifications and create the projector pair
-num_pixels = 64;
+num_pixels = 32;
 num_angles = 180;
-num_detectors = 64;
+num_detectors = 32;
 det_width = 1;
 GPU = 0;
 
@@ -29,7 +29,7 @@ Af = sparse(A); % full(A) is also availabe
 Bf = sparse(B); % full(B) is also availabe
 
 %% Plot one ray moving through the image x
-idx = 10;
+idx = 30;
 xray = reshape(Af(idx, :), num_pixels, num_pixels);
 
 imagesc(xray)

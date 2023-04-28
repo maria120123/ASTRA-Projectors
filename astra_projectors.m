@@ -37,7 +37,7 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 %                     0 and 2*pi for fan beam geoemtry.
 % 
 %   projection_model: Projection model can be 'line', 'strip' or 'linear'.
-%                     - (default) 'linear'
+%                     - (default) 'line'
 % ************************************************************************
 % Output 
 % ************************************************************************

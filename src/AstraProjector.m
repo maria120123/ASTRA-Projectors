@@ -33,7 +33,7 @@ classdef AstraProjector
 
             % Size of the matrix
             sz = size(AB);
-            m = sz(1); n = sz(2);
+            m = double(sz(1)); n = double(sz(2));
 
             % Allocate unit vector
             e = zeros(n, 1);
@@ -48,7 +48,7 @@ classdef AstraProjector
             % ----------------------------------------------------
             for i = 1:n
                 if mod(i, 500) == 0
-                    prog = sprintf("\rCounting nonzeroes: %.1f%%", ...
+                    prog = sprintf("\rCounting nonzeroes: %.2f%%", ...
                         round(i/n * 100, 1, 'decimals'));
                     waitbar(i/n, f, prog)
                 end
@@ -76,7 +76,7 @@ classdef AstraProjector
 
             for i = 1:n
                 if mod(i, 500) == 0
-                    prog = sprintf("\rFilling matrix: %.1f%%", ...
+                    prog = sprintf("\rFilling matrix: %.2f%%", ...
                         round(i/n * 100, 1, 'decimals'));
                     waitbar(i/n, f, prog)
                 end
