@@ -34,7 +34,7 @@ xray = reshape(Af(idx, :), num_pixels, num_pixels);
 
 imagesc(xray)
 
-%% Solve CT problem
+%% Show backprojection
 X = phantom('Modified Shepp-Logan',num_pixels);
 x = X(:);
 
@@ -48,4 +48,4 @@ recon = reshape(B*sinogram(:),num_pixels,num_pixels);
 
 figure();
 imagesc(recon)
-title('Reconstruction')
+title('Backprojection')
