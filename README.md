@@ -1,7 +1,6 @@
 # Documentation for the ASTRA-Projectors package
 
-This MATLAB package creates a pair of matrix free forward and backward
-projectors from ASTRA that are easy to use and incorporate into existing code.
+This MATLAB package creates a pair of matrix free forward and backward projectors from ASTRA that are easy to use and incorporate into existing code. ASTRA is able to use either the CPU or GPU for computations with the projectors, as specified by the user.
 
 ## Supported ASTRA projectors
 The following ASTRA projectors are supported:
@@ -27,10 +26,13 @@ The back projector is automatically chosen when using the ASTRA projectors. The 
 | CPU | Matched       | Matched   |    
 | GPU | Unmatched     | Unmatched |
 
+The mathematical details of the forward and back projectors can be found in the book P. C. Hansen, J. S. Jørgensen, and W. R. B. Lionheart, Computed Tomography: Algorithms, Insight, and Just Enough Theory, SIAM, 2021. Which can be found here: 
+https://my.siam.org/Store/Product/viewproduct/?ProductId=38341835
+
 Note: fan beam geometry is referred to as _fanflat_ in ASTRA.
 
 ## Creating the projector pairs
-The function _astra_projectors()_ creates a projector pair given a set of CT parameters. There are four mandatory input arguments _GPU_, _num_pixels_, _num_angles_, and _num_detectors_. Moreover, further input arguments are accepted which are covered in the function documentation.
+The function _astra_projectors()_ creates a projector pair given a set of CT parameters. There are four mandatory input arguments _GPU_, _num_pixels_, _num_angles_, and _num_detectors_. Further input arguments are accepted which are covered in the function documentation.
 -	Note: Using GPU results in an unmatched projector pair while using CPU results in a matched projector pair.
 
 
@@ -51,6 +53,6 @@ o	An automatic check has been implemented based on the MATLAB package GPU comput
 Include the package folder.
 -	Run either:
     1)	_astra_setup()_ included in this package providing the file path to the ASTRA installation (only the first time).
-    2)	Include the ASTRA directories matlab/mex and matlab/tools.
+    2)	Include the ASTRA directories matlab/mex and matlab/tools in your MATLAB path.
 
 Now you are ready to use the ASTRA-Projectors package.
