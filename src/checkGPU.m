@@ -1,21 +1,36 @@
-function ier = checkGPU(use_gpu)
-    ier = 0;
+function checkGPU(use_gpu)
+%checkGPU  returns 'true' if GPU-use is required but a GPU is not available
+%
+% Requires that the Paralle Computing Toolbox is installed.
+
+% Written by Maria Knudsen, April 28, 2023.
+
+    % Internal error codes
+    passed          = 10;
+    missing_package = 11;
+    missing_gpu     = 12;
 
     if use_gpu
         % Count the number of GPUs visible by MATLAB
         try
-            num_gpu = gpuDeviceCount("all");
+            num_gpu = gpuDeviceCount("available");
+
+            % Check if a GPU is available
+            if num_gpu == 0
+                error_check = missing_gpu;
+            else
+                error_check = passed;
+            end
         catch
-            ier = 1;
-            %warning("Automatic check for present GPU failed. " + ...
-            %    "Ensure that your computer has a CUDA compatible GPU.");
-            return
+            error_check = missing_package;
         end
-        gpu_found = num_gpu > 0;
-    
-        % Check if user requests to use a GPU
-        if ~gpu_found && use_gpu
-            error("No GPU found, aborting setup.")
+
+        % Pass errors to the user if any occured
+        if error_check == missing_gpu
+            error("A GPU is not available.")
+        elseif error_check == missing_package
+            error("Parallel Computing Toolbox is not installed, " + ...
+                "unable to offload to GPU.")
         end
     end
 

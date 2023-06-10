@@ -1,5 +1,8 @@
 % AstraProjector Superclass of forward and backward-projectors wrapping
 % ASTRA calls.
+
+% Written by Maria Knudsen, April 28, 2023.
+
 classdef AstraProjector
 
     properties

@@ -8,7 +8,8 @@ function astra_setup(astra_root)
 % ************************************************************************
 % astra_root: Path to ASTRA toolbox
 %             - example: "home/astra" 
-%
+
+% Written by Maria Knudsen, April 28, 2023.
 
     % Save old directory
     old_dir = pwd;

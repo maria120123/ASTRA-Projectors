@@ -7,6 +7,9 @@
 %   Multiplication:         * or mtines().
 %   Matrix represntation:   full() or sparse().
 %   Size output:            size().
+
+% Written by Maria Knudsen, April 28, 2023.
+
 classdef AstraBackwardProjector < AstraProjector
 
     methods
@@ -53,7 +56,7 @@ classdef AstraBackwardProjector < AstraProjector
             m = self.num_pixels * self.num_pixels;
             n = self.num_angles * self.num_detectors;
 
-            dims = [m, n];
+            dims = double([m, n]);
 
             if nargin == 1
                 sz = dims;

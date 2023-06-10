@@ -1,65 +1,94 @@
 function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
     num_detectors, det_width, proj_geom, source_origin, origin_det, ...
     projection_model, angles)
-% Create and return an unmatched projector pair from ASTRA.
+%astra_projectors Create a matched or unmatched projector pair from ASTRA
 % 
-% OBS! You need to have a GPU - a warning will be printed if no GPU is
-% found.
+% OBS! To create an unmatched pair, you need to have an NVIDIA GPU.
+% A warning will be printed if no such GPU is found.
+%
+% [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
+%    num_detectors, det_width, proj_geom, source_origin, origin_det, ...
+%    projection_model, angles)
 %
 % ************************************************************************
 % Input
 % ************************************************************************
 % Minimum requirement for astra_projectors() are the first four input
-% parameters (num_pixels, num_angles, num_detectors, and det_width).
-%   GPU:              False (0) the algorithm uses the CPU and True (1) the
-%                     algorithm uses CPU.
+% parameters (GPU, num_pixels, num_angles, and num_detectors).
+%   GPU:              False: the algorithm uses the CPU,
+%                     True:  the algorithm uses the GPU.
 %  
-%   num_pixels:       Number of pixels in a row/coloumn (quadratic problem).
+%   num_pixels:       Number of pixels in a row/coloumn, i.e., the image
+%                     is always square of size num_pixels x num_pixels.
 %
 %   num_angles:       Number of view angles.
 %
 %   num_detectors:    Number of detector elements.
 % 
-%   det_width:        Width of detector element.
+%   det_width:        Width of detector element; default 1.
 % 
-%   proj_geom:        Projection geometry - should be "parallel" or "fanflat"
-%                     - (default) Parallel beam geometry
+%   proj_geom:        Projection geometry, "parallel" or "fanflat";
+%                     default is parallel beam geometry.
 %
-%   source_origin:    Distance from source to origin/center
-%                     - No need to include if parallel beam geometry is used.
+%   source_origin:    Distance from source to origin/center;
+%                     no need to include if parallel beam geometry is used.
 %
-%   origin_det:       Distance from origin/center to detector
-%                     - No need to include if parallel beam geometry is used.
+%   origin_det:       Distance from origin/center to detector;
+%                     no need to include if parallel beam geometry is used.
 %
-%   angles:           All view angles
-%                     - (default) Equidistant angles between 0 and pi for
+%   angles:           A vector with all view angles;
+%                     default isqeuidistant angles between 0 and pi for
 %                     parallel beam geometry and equidistant angles between 
 %                     0 and 2*pi for fan beam geoemtry.
 % 
-%   projection_model: Projection model can be 'line', 'strip' or 'linear'.
-%                     - (default) 'line'
+%   projection_model: Can be 'line', 'strip' or 'linear' (the latter is
+%                     also known as Josept); default is 'line';
+%                     no need to include if GPU = false.
+%
 % ************************************************************************
 % Output 
 % ************************************************************************
-% astra_projectors() outputs an unmatched projector pair A and B.
+% The output consists of a matched or unmatched projector pair A and B,
+% depending on the choice of the input GPU, in the form of operators.
 %
 %   A: Forward projection operator.
 %
 %   B: Back projection operator.
 %
+% ************************************************************************
+% Comments
+% ************************************************************************
+% To generate the corresponding sparse matrices, use the function sparse.
+%
+% If GPU = false, a matching pair with B = A' is always returned; then
+% there are three choices of the discretization model as specified by
+% the input parameter projection_model.
+%
+% If GPU = true, an unmatched pair is always returned; then A uses the
+% linear (Joseph) model and B always uses the standard back projection model.
+
+% Reference: P.C. Hansen, J.S. Jorgensen, and W.R.B Lionheart (Eds.),
+% "Computed Tomography: Algorithms, Insight, and Just Enough Theory",
+% SIAM, PA, 2021.
+
+% Written by Maria Knudsen (with minor changes by PCH), May 4, 2023.
 
 % List of arguments
 arguments
-    GPU                 int64
+    GPU                 logical
     num_pixels          int64
     num_angles          int64
     num_detectors       int64
-    det_width           double
+    det_width           double          = missing
     proj_geom           (1,:)           = missing
     source_origin                       = missing
     origin_det                          = missing
     projection_model    (1,:) char      = 'line'
     angles              (1,:) double    = missing
+end
+
+if ismissing(det_width)
+    det_width = 1;
 end
 
 if ismissing(proj_geom)
@@ -92,10 +121,9 @@ end
 % Error checks
 % ---------------------------------------------------------------
 % Ensure that all dependencies are correctly set up
-include_paths();
 
 % Ensure that there is a GPU device
-check_failed = checkGPU(GPU);
+checkGPU(GPU);
 
 % Setting up the geometry
 % ---------------------------------------------------------------
@@ -111,18 +139,9 @@ else
 end
 
 if GPU
-    try
-        projection_id = astra_create_projector('cuda', projection_geometry,... 
-            volume_geometry);  % using GPU
-    catch err
-        if check_failed
-            warning("MATLAB could not detect a GPU device ensure you" + ...
-                " have installed the GPU computing package. ")
-        end
-        rethrow(err)
-    end
+    projection_id = astra_create_projector('cuda', projection_geometry,... 
+        volume_geometry);  % using GPU
 else
-    % 
     if ~parallel_beam
         projection_model = strcat(projection_model, '_fanflat');
     end
@@ -142,38 +161,3 @@ B = AstraBackwardProjector(num_angles, num_pixels, num_detectors, ...
     projection_id, projection_geometry, volume_geometry, GPU);
 
 end
-
-
-function include_paths()
-    old_dir       = pwd();
-    projector_dir = my_filepath();
-    
-    cd(projector_dir);
-    
-    try
-        addpath("src/")
-        if isfile(".astra_root.mat")
-            load(".astra_root.mat")
-            addpath(astra_root + "/matlab/mex")
-            addpath(astra_root + "/matlab/tools")
-        end
-    catch
-        cd(old_dir);
-    end
-    cd(old_dir);
-end
-
-% Magic
-function out = my_filepath()
-
-    mfilePath = mfilename('fullpath');
-    
-    if contains(mfilePath,'LiveEditorEvaluationHelper')
-        mfilePath = matlab.desktop.editor.getActiveFilename;
-    end
-
-    out = extractBefore(mfilePath,"/astra_projectors");
-
-end
-
-

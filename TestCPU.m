@@ -12,7 +12,7 @@ num_pixels = 32;
 num_angles = 180;
 num_detectors = 32;
 det_width = 1;
-GPU = 0;
+GPU = false;
 
 [A, B] = astra_projectors(GPU, num_pixels, num_angles, num_detectors, ...
     det_width, missing, missing, missing, 'linear');

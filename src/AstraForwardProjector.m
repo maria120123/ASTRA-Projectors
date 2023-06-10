@@ -7,6 +7,9 @@
 %   Multiplication:         * or mtines().
 %   Matrix represntation:   full() or sparse().
 %   Size output:            size().
+
+% Written by Maria Knudsen, April 28, 2023.
+
 classdef AstraForwardProjector < AstraProjector
 
     methods
@@ -53,7 +56,7 @@ classdef AstraForwardProjector < AstraProjector
             m = self.num_angles * self.num_detectors;
             n = self.num_pixels * self.num_pixels;
 
-            dims = [m, n];
+            dims = double([m, n]);
 
             if nargin == 1
                 sz = dims;
@@ -62,7 +65,7 @@ classdef AstraForwardProjector < AstraProjector
             end
         end
 
-        function sparse_matrix = sparse(A)
+        %function sparse_matrix = sparse(A)
             % sparse create sparse matrix.
             % sparse_matrix = sparse(A) converts an ASTRA projector into a
             % sparse matrix 
@@ -74,10 +77,10 @@ classdef AstraForwardProjector < AstraProjector
             %   sparse_matrix: Sparse representation of the forward
             %   operator A.
             
-            matrix_id = astra_mex_projector('matrix', A.projection_id);
-            sparse_matrix = astra_mex_matrix('get', matrix_id);
-            astra_mex_matrix('delete', matrix_id);
-        end
+        %    matrix_id = astra_mex_projector('matrix', A.projection_id);
+        %    sparse_matrix = astra_mex_matrix('get', matrix_id);
+        %    astra_mex_matrix('delete', matrix_id);
+        %end
 
         
         function y = mtimes(A, x)
