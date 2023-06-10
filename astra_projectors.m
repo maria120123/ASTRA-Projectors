@@ -1,12 +1,12 @@
-function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
+function [A, B] = astra_projectors(use_gpu, num_pixels, num_angles, ...
     num_detectors, det_width, proj_geom, source_origin, origin_det, ...
     projection_model, angles)
 %astra_projectors Create a matched or unmatched projector pair from ASTRA
 % 
 % OBS! To create an unmatched pair, you need to have an NVIDIA GPU.
-% A warning will be printed if no such GPU is found.
+% A error will be thrown if no such GPU is found.
 %
-% [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
+% [A, B] = astra_projectors(use_gpu, num_pixels, num_angles, ...
 %    num_detectors, det_width, proj_geom, source_origin, origin_det, ...
 %    projection_model, angles)
 %
@@ -14,8 +14,8 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 % Input
 % ************************************************************************
 % Minimum requirement for astra_projectors() are the first four input
-% parameters (GPU, num_pixels, num_angles, and num_detectors).
-%   GPU:              False: the algorithm uses the CPU,
+% parameters (use_gpu, num_pixels, num_angles, and num_detectors).
+%   use_gpu:          False: the algorithm uses the CPU,
 %                     True:  the algorithm uses the GPU.
 %  
 %   num_pixels:       Number of pixels in a row/coloumn, i.e., the image
@@ -43,13 +43,13 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 % 
 %   projection_model: Can be 'line', 'strip' or 'linear' (the latter is
 %                     also known as Josept); default is 'line';
-%                     no need to include if GPU = false.
+%                     no need to include if use_gpu = false.
 %
 % ************************************************************************
 % Output 
 % ************************************************************************
 % The output consists of a matched or unmatched projector pair A and B,
-% depending on the choice of the input GPU, in the form of operators.
+% depending on the choice of the input use_gpu, in the form of operators.
 %
 %   A: Forward projection operator.
 %
@@ -60,11 +60,11 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 % ************************************************************************
 % To generate the corresponding sparse matrices, use the function sparse.
 %
-% If GPU = false, a matching pair with B = A' is always returned; then
+% If use_gpu = false, a matching pair with B = A' is always returned; then
 % there are three choices of the discretization model as specified by
 % the input parameter projection_model.
 %
-% If GPU = true, an unmatched pair is always returned; then A uses the
+% If use_gpu = true, an unmatched pair is always returned; then A uses the
 % linear (Joseph) model and B always uses the standard back projection model.
 
 % Reference: P.C. Hansen, J.S. Jorgensen, and W.R.B Lionheart (Eds.),
@@ -75,7 +75,7 @@ function [A, B] = astra_projectors(GPU, num_pixels, num_angles, ...
 
 % List of arguments
 arguments
-    GPU                 logical
+    use_gpu             logical
     num_pixels          int64
     num_angles          int64
     num_detectors       int64
@@ -123,7 +123,7 @@ end
 % Ensure that all dependencies are correctly set up
 
 % Ensure that there is a GPU device
-checkGPU(GPU);
+checkGPU(use_gpu);
 
 % Setting up the geometry
 % ---------------------------------------------------------------
@@ -154,10 +154,10 @@ end
 % ----------------------------------------------------------------
 % Create forward projector
 A = AstraForwardProjector(num_angles, num_pixels, num_detectors, ...
-    projection_id, projection_geometry, volume_geometry, GPU);
+    projection_id, projection_geometry, volume_geometry, use_gpu);
 
 % Create backward projector
 B = AstraBackwardProjector(num_angles, num_pixels, num_detectors, ...
-    projection_id, projection_geometry, volume_geometry, GPU);
+    projection_id, projection_geometry, volume_geometry, use_gpu);
 
 end
