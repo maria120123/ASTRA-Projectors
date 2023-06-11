@@ -30,7 +30,7 @@ function checkGPU(use_gpu)
             error("A GPU is not available.")
         elseif error_check == missing_package
             error("Parallel Computing Toolbox is not installed, " + ...
-                "unable to offload to GPU.")
+                "unable to use a GPU.")
         end
     end
 

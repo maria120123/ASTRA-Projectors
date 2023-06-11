@@ -138,7 +138,7 @@ else
         num_detectors, angles, source_origin, origin_det);
 end
 
-if GPU
+if use_gpu
     projection_id = astra_create_projector('cuda', projection_geometry,... 
         volume_geometry);  % using GPU
 else
